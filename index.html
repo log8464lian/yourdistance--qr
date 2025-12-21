@@ -22,50 +22,31 @@
 <div id="confirm" class="modal">
   <h3>温馨提示</h3>
   <p style="margin:12px 0;color:#555">准备接收今日份温柔～</p>
-  <button id="okBtn">确定</button>
+  <button id="okBtn" disabled>确定</button>
 </div>
 
 <script>
-/* ===== 1. 数据直接写死，不再 fetch ===== */
-const colors = [
-  '#e60026','#ff5400','#ff8d00','#f6bc00','#a6e700',
-  '#00c853','#0091ea','#3d5afe','#651fff','#d500f9',
-  '#ff4081','#607d8b'
-];
-const sentences = [
-  '日子虽平，却有细碎的光在闪烁。',
-  '把不开心随风散去，让阳光住进心里。',
-  '温柔是铠甲，也是软肋，更是力量。',
-  '勇敢一点，山河星月都为你作贺礼。',
-  '慢慢来，人生才显得隆重。',
-  '你逆光而来，配得上这世间所有的好。',
-  '别急，会有突如其来的惊喜。',
-  '风停在窗边，嘱咐你要热爱这个世界。',
-  '万物皆有裂痕，那是光照进来的地方。',
-  '把烦恼丢进夕阳里，和星星一起沉沦。',
-  '你未必万丈光芒，但始终温暖有光。',
-  '保持热爱，奔赴下一场山海。',
-  '宇宙从不失约任何秘密悸动与浪漫追求。',
-  '如果事与愿违，请相信另有安排。',
-  '花会沿路盛开，你以后的路也是。',
-  '别怕路长梦远，总有清风明月相伴。',
-  '你负责善良，时间会给你惊喜。',
-  '向前看，前方有星月可以寄望。',
-  '把期望降到最低，所有遇见都是礼物。',
-  '生活给你苦难，其实是在铺垫浪漫。',
-  '山高水长，怕什么来不及。',
-  '太阳下山夜里也有灯打开，你看这世界不坏。',
-  '一切尽意，百事从欢。',
-  '此后山高水远，总有人为你而来。',
-  '认真生活，就能找到被人生偷藏起来的糖果。',
-  '慢慢来，谁不是翻山越岭去爱。',
-  '天气晴，宜收集快乐。',
-  '愿你一生清澈明朗，所遇皆良善。',
-  '风月都好看，人间也浪漫。',
-  '世界很大，开心第一。'
-];
+/* ===== 1. 先声明空数组 ===== */
+let colors = [];
+let sentences = [];
 
-/* ===== 2. 逻辑部分 ===== */
+/* ===== 2. 拉取 data.json ===== */
+fetch('data.json')
+  .then(r => r.json())
+  .then(d => {
+    colors  = d.colors;
+    sentences = d.sentences;
+    /* 数据到位才允许点“确定” */
+    document.getElementById('okBtn').disabled = false;
+  })
+  .catch(err => {
+    alert('加载配置失败，请检查网络~');
+  });
+
+/* ===== 3. 按钮先禁用 ===== */
+document.getElementById('okBtn').disabled = true;
+
+/* ===== 4. 逻辑部分 ===== */
 const okBtn = document.getElementById('okBtn');
 const confirmBox = document.getElementById('confirm');
 
@@ -74,7 +55,9 @@ okBtn.onclick = () => {
   startRain();
 };
 
-function rand(n) { return Math.floor(Math.random() * n); }
+function rand(n) {
+  return Math.floor(Math.random() * n);
+}
 
 function startRain() {
   const tick = () => {
@@ -87,8 +70,8 @@ function startRain() {
     document.body.appendChild(p);
     setTimeout(() => p.remove(), 4000);
   };
-  tick();                       // 先出第一个
-  setInterval(tick, 1100);      // 以后每 1.1 秒一个
+  tick();               // 先出第一个
+  setInterval(tick, 1100); // 以后每 1.1 秒一个
 }
 </script>
 </body>
