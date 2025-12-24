@@ -79,6 +79,9 @@
   </div>
 
   <script>
+  window.addEventListener('error', e => {
+    alert('资源加载失败：' + e.filename + '\n' + e.message);
+  }, true);
   /* ========== 新增：维护当前在屏上的 pop 节点 ========== */
   const MAX_POP = 24;          // 同时最多保留几个
   const popStack = [];        // 按生成顺序保存节点引用
