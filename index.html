@@ -138,11 +138,20 @@
   function createOne() {
     const p = document.createElement('div');
     p.className = 'pop';
-    p.style.background = colors[rand(colors.length)];
-    p.style.left = rand(window.innerWidth - 220) + 'px';
+    
+    /* ----- 新位置逻辑 ----- */
+    const COL = 3;   // 分 3 栏
+    const colW = Math.floor(safeW / COL);
+    const col  = rand(COL);
+    p.style.left = MARGIN + col * colW + rand(colW - POP_W + 1) + 'px';
+    /* --------------------- */
+
     p.style.top  = rand(window.innerHeight - 80) + 'px';
+    p.style.background = colors[rand(colors.length)];
     p.textContent = nextSentence();
     document.body.appendChild(p);
+    
+    
     /* ---------- 新增：入栈 + 自动清理 ---------- */
     popStack.push(p);                 // 1. 入栈
     if (popStack.length > MAX_POP) {  // 2. 超上限
