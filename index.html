@@ -57,7 +57,7 @@
 <body>
   <!-- 音乐 -->
   <button id="musicCtrl" title="音乐开关">🎵</button>
-  <audio id="bgMusic" src="bgm.mp3" loop></audio>
+  <audio id="bgMusic" src="bgm.mp3" loop muted autoplay></audio>
 
   <!-- 初始确认框 -->
   <div id="confirm" class="modal">
@@ -67,40 +67,45 @@
   </div>
 
   <script>
+  /* ========== 新增：维护当前在屏上的 pop 节点 ========== */
+  const MAX_POP = 40;          // 同时最多保留几个
+  const popStack = [];        // 按生成顺序保存节点引用
+
   /* ========== 音乐控制 ========== */
   const bgMusic = document.getElementById('bgMusic');
   const musicBtn = document.getElementById('musicCtrl');
+
+  /* 取消静音 + 恢复到正常音量 */
+  bgMusic.volume = 1;
+  bgMusic.muted = false;
+  musicBtn.textContent = '♫';   // 初始为正在播放状态
+
+  /* 点击图标开关 */
   musicBtn.onclick = () => {
     if (bgMusic.paused) {
       bgMusic.play();
-      musicBtn.textContent = '🎵';
+      musicBtn.textContent = '♫';
     } else {
       bgMusic.pause();
-      musicBtn.textContent = '🔇';
+      musicBtn.textContent = '♪';
     }
   };
-  // 浏览器首次交互后自动播放
-  document.body.addEventListener('touchstart', () => {
-    if (bgMusic.paused) bgMusic.play();
-  }, { once: true });
 
   /* ========== 弹窗逻辑 ========== */
-  let colors = [],         // 颜色池（可重复）
-      sentencePool = [],   // 当前轮次未出现的句子
-      allSentences = [];   // 原始句子总库
+  let colors = [],
+      sentencePool = [],
+      allSentences = [];
 
   fetch('data.json')
     .then(r => r.json())
     .then(d => {
-      colors = d.colors;
+      colors  = d.colors;
       allSentences = d.sentences;
-      shuffle(allSentences);     // 首轮洗牌
+      shuffle(allSentences);
       sentencePool = [...allSentences];
       document.getElementById('okBtn').disabled = false;
     })
-    .catch(err => {
-      alert('加载配置失败，请检查网络~');
-    });
+    .catch(err => alert('加载配置失败，请检查网络~'));
 
   document.getElementById('okBtn').disabled = true;
   const okBtn = document.getElementById('okBtn');
@@ -115,35 +120,42 @@
     return Math.floor(Math.random() * n);
   }
 
-  /* Fisher-Yates 洗牌 */
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
-   }
+    }
   }
 
-  /* 取下一句（无重复） */
   function nextSentence() {
-    if (sentencePool.length === 0) {   // 本轮用完，重新洗牌
-      shuffle(allSentences);
-      sentencePool = [...allSentences];
+    if (!sentencePool.length) {          // 本轮真正用完
+      shuffle(allSentences);             // 重新洗牌
+      sentencePool = [...allSentences];  // 建新池
     }
     return sentencePool.pop();
   }
 
+  function createOne() {
+    const p = document.createElement('div');
+    p.className = 'pop';
+    p.style.background = colors[rand(colors.length)];
+    p.style.left = rand(window.innerWidth - 220) + 'px';
+    p.style.top  = rand(window.innerHeight - 80) + 'px';
+    p.textContent = nextSentence();
+    document.body.appendChild(p);
+    /* ---------- 新增：入栈 + 自动清理 ---------- */
+    popStack.push(p);                 // 1. 入栈
+    if (popStack.length > MAX_POP) {  // 2. 超上限
+      popStack.shift().remove();      // 3. 删掉最早的一个
+    }  
+  }
+    
   function startRain() {
-    const tick = () => {
-      const p = document.createElement('div');
-      p.className = 'pop';
-      p.style.background = colors[rand(colors.length)];
-      p.style.left = rand(window.innerWidth - 220) + 'px';
-      p.style.top = rand(window.innerHeight - 80) + 'px';
-      p.textContent = nextSentence();  // 用无重复取句函数
-      document.body.appendChild(p);
-    };
-    tick();
-    setInterval(tick, 1100);
+    function tick() {
+      createOne();                       // 显示一条
+      setTimeout(tick, 1100);            // 等 1.1 秒再下一条
+    }
+    tick();                              // 启动第一条
   }
 
   </script>
