@@ -153,32 +153,27 @@
   function createOne() {
     const p = document.createElement('div');
     p.className = 'pop';
-    p.style.visibility = 'hidden';          // 先藏起来，量完再显示
-    p.textContent = nextSentence();
-    document.body.appendChild(p);           // 插到 DOM 才能量
 
-    /* ===== 1. 量出它实际有多宽 ===== */
-    const realW = p.offsetWidth;            // 包含 padding 后的宽度
-    const MARGIN = 20;                      // 左右各留一点边距
-    const safeW = window.innerWidth - realW - MARGIN * 2;
+    /* ===== 1. 强制固定宽度（已含 padding） ===== */
+    const POP_W  = 180;                 // 实测 14*2+22*2+平均字数≈180
+    p.style.width = POP_W + 'px';
 
-    /* ===== 2. 分栏 & 随机列 ===== */
-    const COL = 3;
-    const colW = Math.floor(safeW / COL);
-    const col  = rand(COL);
-    const left = MARGIN + col * colW + rand(colW);
-
-    /* ===== 3. 真正定位 + 上色 + 显示 ===== */
-    p.style.left = Math.min(left, window.innerWidth - realW - MARGIN) + 'px';
+    /* ===== 2. 绝对安全 left ===== */
+    const MARGIN = 16;                  // 左右各留 16 px
+    const maxLeft = window.innerWidth - POP_W - MARGIN;
+    p.style.left = MARGIN + rand(Math.max(1, maxLeft - MARGIN)) + 'px';
     p.style.top  = rand(window.innerHeight - 80) + 'px';
+
+    /* ===== 3. 内容 & 颜色 ===== */
+    p.textContent = nextSentence();
     p.style.background = colors[rand(colors.length)];
-    p.style.visibility = '';
 
     /* ===== 4. 入栈 & 自动清理 ===== */
+    document.body.appendChild(p);
     popStack.push(p);
     if (popStack.length > MAX_POP) {
       const old = popStack.shift();
-      old.parentNode && old.parentNode.removeChild(old);
+      old.remove();
     }
   }
     
