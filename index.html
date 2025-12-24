@@ -55,12 +55,7 @@
 
     /* ===== 新增：全屏自适应背景 ===== */
     body {
-      background: #fff9f9 url('bg-1440.webp') no-repeat center/cover fixed;
-    }
-    @supports not (background-image: url('bg-1440.webp')) {
-      body {
-        background-image: url('bg-1440.jpg');
-      }
+      background: #fff9f9 url('bg.jpg') no-repeat center/cover fixed;
     }
     /* 手机端兼容：防止部分浏览器对 fixed 背景不渲染或抖动 */
     @media (max-width: 768px) {
