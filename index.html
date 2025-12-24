@@ -24,6 +24,7 @@
       -webkit-backdrop-filter:blur(12px);
       background:rgba(255,255,255,.18);   /* 半透明底色 */
       animation:fadeIn .7s cubic-bezier(.22,.61,.36,1);
+       z-index: 10;
     }
     @keyframes fadeIn{
       from{opacity:0;transform:translateY(20px) scale(.92)}
@@ -51,6 +52,17 @@
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
     }
+
+    /* ===== 新增：全屏自适应背景 ===== */
+    body {
+      background: #fff9f9 url('bg.jpg') no-repeat center/cover fixed;
+    }
+    /* 手机端兼容：防止部分浏览器对 fixed 背景不渲染或抖动 */
+    @media (max-width: 768px) {
+      body {
+        background-attachment: initial;   /* 允许随内容滚动，避免黑屏/空白 */
+      }
+    }
   </style>
 </head>
 
@@ -68,7 +80,7 @@
 
   <script>
   /* ========== 新增：维护当前在屏上的 pop 节点 ========== */
-  const MAX_POP = 20;          // 同时最多保留几个
+  const MAX_POP = 24;          // 同时最多保留几个
   const popStack = [];        // 按生成顺序保存节点引用
 
   /* ========== 音乐控制 ========== */
@@ -139,18 +151,19 @@
     const p = document.createElement('div');
     p.className = 'pop';
     
-    /* ----- 新位置逻辑 ----- */
-    const COL = 3;   // 分 3 栏
-    const colW = Math.floor(safeW / COL);
-    const col  = rand(COL);
+    /* ===== 先算变量，再使用 ===== */
+    const MARGIN = 20;                // 左右安全边距
+    const POP_W  = 160;               // 弹窗实际最大宽度
+    const safeW  = window.innerWidth - POP_W - MARGIN * 2;
+    const COL    = 3;                 // 想分几栏就写几
+    const colW   = Math.floor(safeW / COL);
+    const col    = rand(COL);
     p.style.left = MARGIN + col * colW + rand(colW - POP_W + 1) + 'px';
-    /* --------------------- */
-
     p.style.top  = rand(window.innerHeight - 80) + 'px';
+
     p.style.background = colors[rand(colors.length)];
     p.textContent = nextSentence();
     document.body.appendChild(p);
-    
     
     /* ---------- 新增：入栈 + 自动清理 ---------- */
     popStack.push(p);                 // 1. 入栈
