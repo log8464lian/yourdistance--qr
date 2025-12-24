@@ -155,13 +155,10 @@
     p.className = 'pop';
 
     /* ===== 先算变量，再使用 ===== */
-    const MARGIN = 20;                // 左右安全边距
-    const POP_W  = 160;               // 弹窗实际最大宽度
-    const safeW  = window.innerWidth - POP_W - MARGIN * 2;
-    const COL    = 3;                 // 想分几栏就写几
-    const colW   = Math.floor(safeW / COL);
-    const col    = rand(COL);
-    p.style.left = MARGIN + col * colW + rand(colW - POP_W + 1) + 'px';
+    const MARGIN = 30;                // 左右安全边距
+    p.style.left = MARGIN + rand(
+      Math.max(0, window.innerWidth - p.offsetWidth - MARGIN * 2)
+    ) + 'px';
     p.style.top  = rand(window.innerHeight - 80) + 'px';
     /* =========================== */
 
