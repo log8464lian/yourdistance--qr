@@ -47,6 +47,10 @@
       cursor:pointer;
       z-index:9999;
     }
+    body{
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
   </style>
 </head>
 
@@ -81,12 +85,17 @@
   }, { once: true });
 
   /* ========== 弹窗逻辑 ========== */
-  let colors = [], sentences = [];
+  let colors = [],         // 颜色池（可重复）
+      sentencePool = [],   // 当前轮次未出现的句子
+      allSentences = [];   // 原始句子总库
+
   fetch('data.json')
     .then(r => r.json())
     .then(d => {
       colors = d.colors;
-      sentences = d.sentences;
+      allSentences = d.sentences;
+      shuffle(allSentences);     // 首轮洗牌
+      sentencePool = [...allSentences];
       document.getElementById('okBtn').disabled = false;
     })
     .catch(err => {
@@ -106,6 +115,23 @@
     return Math.floor(Math.random() * n);
   }
 
+  /* Fisher-Yates 洗牌 */
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+   }
+  }
+
+  /* 取下一句（无重复） */
+  function nextSentence() {
+    if (sentencePool.length === 0) {   // 本轮用完，重新洗牌
+      shuffle(allSentences);
+      sentencePool = [...allSentences];
+    }
+    return sentencePool.pop();
+  }
+
   function startRain() {
     const tick = () => {
       const p = document.createElement('div');
@@ -113,12 +139,13 @@
       p.style.background = colors[rand(colors.length)];
       p.style.left = rand(window.innerWidth - 220) + 'px';
       p.style.top = rand(window.innerHeight - 80) + 'px';
-      p.textContent = sentences[rand(sentences.length)];
+      p.textContent = nextSentence();  // 用无重复取句函数
       document.body.appendChild(p);
     };
     tick();
     setInterval(tick, 1100);
   }
+
   </script>
 </body>
 </html>
