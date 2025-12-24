@@ -154,27 +154,27 @@
     const p = document.createElement('div');
     p.className = 'pop';
 
-    /* ===== 1. 强制固定宽度（已含 padding） ===== */
-    const POP_W  = 180;                 // 实测 14*2+22*2+平均字数≈180
+    /* 1. 固定宽度，防止自动撑开 */
+    const POP_W  = 180;
     p.style.width = POP_W + 'px';
 
-    /* ===== 2. 绝对安全 left ===== */
-    const MARGIN = 16;                  // 左右各留 16 px
-    const maxLeft = window.innerWidth - POP_W - MARGIN;
-    p.style.left = MARGIN + rand(Math.max(1, maxLeft - MARGIN)) + 'px';
-    p.style.top  = rand(window.innerHeight - 80) + 'px';
+    /* 2. 先用百分比随便摆，再用 translate 把自己宽度的一半收回来，
+          这样元素中心一定在 0~100% 之间，左右永远贴不到边。 */
+    const centerPercent = 10 + Math.random() * 80;   // 10% ~ 90%
+    p.style.left = centerPercent + '%';
+    p.style.transform = 'translateX(-50%)';          // 中心对齐
 
-    /* ===== 3. 内容 & 颜色 ===== */
+    /* 3. 上下随机 */
+    p.style.top = rand(window.innerHeight - 80) + 'px';
+
+    /* 4. 内容 & 颜色 */
     p.textContent = nextSentence();
     p.style.background = colors[rand(colors.length)];
 
-    /* ===== 4. 入栈 & 自动清理 ===== */
+    /* 5. 入栈 & 自动清理 */
     document.body.appendChild(p);
     popStack.push(p);
-    if (popStack.length > MAX_POP) {
-      const old = popStack.shift();
-      old.remove();
-    }
+    if (popStack.length > MAX_POP) popStack.shift().remove();
   }
     
   function startRain() {
