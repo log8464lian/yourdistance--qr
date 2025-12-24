@@ -146,7 +146,8 @@
     /* ---------- 新增：入栈 + 自动清理 ---------- */
     popStack.push(p);                 // 1. 入栈
     if (popStack.length > MAX_POP) {  // 2. 超上限
-      popStack.shift().remove();      // 3. 删掉最早的一个
+      const old = popStack.shift();      // 3. 删掉最早的一个
+      old.parentNode && old.parentNode.removeChild(old);
     }  
   }
     
