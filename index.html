@@ -153,27 +153,33 @@
   function createOne() {
     const p = document.createElement('div');
     p.className = 'pop';
-    
-    /* ===== 先算变量，再使用 ===== */
-    const MARGIN = 20;                // 左右安全边距
-    const POP_W  = 160;               // 弹窗实际最大宽度
-    const safeW  = window.innerWidth - POP_W - MARGIN * 2;
-    const COL    = 3;                 // 想分几栏就写几
-    const colW   = Math.floor(safeW / COL);
-    const col    = rand(COL);
-    p.style.left = MARGIN + col * colW + rand(colW - POP_W + 1) + 'px';
-    p.style.top  = rand(window.innerHeight - 80) + 'px';
-
-    p.style.background = colors[rand(colors.length)];
+    p.style.visibility = 'hidden';          // 先藏起来，量完再显示
     p.textContent = nextSentence();
-    document.body.appendChild(p);
-    
-    /* ---------- 新增：入栈 + 自动清理 ---------- */
-    popStack.push(p);                 // 1. 入栈
-    if (popStack.length > MAX_POP) {  // 2. 超上限
-      const old = popStack.shift();      // 3. 删掉最早的一个
+    document.body.appendChild(p);           // 插到 DOM 才能量
+
+    /* ===== 1. 量出它实际有多宽 ===== */
+    const realW = p.offsetWidth;            // 包含 padding 后的宽度
+    const MARGIN = 20;                      // 左右各留一点边距
+    const safeW = window.innerWidth - realW - MARGIN * 2;
+
+    /* ===== 2. 分栏 & 随机列 ===== */
+    const COL = 3;
+    const colW = Math.floor(safeW / COL);
+    const col  = rand(COL);
+    const left = MARGIN + col * colW + rand(colW);
+
+    /* ===== 3. 真正定位 + 上色 + 显示 ===== */
+    p.style.left = Math.min(left, window.innerWidth - realW - MARGIN) + 'px';
+    p.style.top  = rand(window.innerHeight - 80) + 'px';
+    p.style.background = colors[rand(colors.length)];
+    p.style.visibility = '';
+
+    /* ===== 4. 入栈 & 自动清理 ===== */
+    popStack.push(p);
+    if (popStack.length > MAX_POP) {
+      const old = popStack.shift();
       old.parentNode && old.parentNode.removeChild(old);
-    }  
+    }
   }
     
   function startRain() {
