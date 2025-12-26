@@ -155,10 +155,7 @@
     p.className = 'pop';
 
     /* ===== 先算变量，再使用 ===== */
-    const MARGIN = 10;                // 左右安全边距
-    p.style.left = MARGIN + rand(
-      Math.max(0, window.innerWidth - p.offsetWidth - MARGIN * 2)
-    ) + 'px';
+    p.style.left = rand(window.innerWidth - 220) + 'px';
     p.style.top  = rand(window.innerHeight - 80) + 'px';
     /* =========================== */
 
@@ -181,6 +178,48 @@
     tick();                              // 启动第一条
   }
 
+  </script>
+
+  <!-- ===== 观众互动弹幕 ===== -->
+  <style>
+  #dmBox{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:99999}
+  #dmInput{border:none;padding:10px 14px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.2);width:180px;font-size:14px}
+  #dmSend{background:#ff006e;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-size:14px;cursor:pointer}
+  .dm{position:fixed;white-space:nowrap;font-size:20px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);
+      animation:dmMove 10s linear;z-index:99998;pointer-events:none;top:var(--dm-top)}
+  @keyframes dmMove{from{right:-100%}to{right:100%}}
+  </style>
+
+  <div id="dmBox">
+    <input id="dmInput" placeholder="说点什么吧～" maxlength="30">
+    <button id="dmSend">发射</button>
+  </div>
+
+  <script>
+  /* 弹幕相关 DOM */
+  const dmInput=document.getElementById('dmInput');
+  const dmSend=document.getElementById('dmSend');
+  const dmColors=['#ff006e','#ffbe0b','#fb5607','#8338ec','#3a86ff','#06ffa5'];
+
+  /* 随机高度 */
+  function dmTop(){return Math.random()*window.innerHeight*.8+20}
+
+  /* 创建一条弹幕 */
+  function shootDm(text){
+    const span=document.createElement('div');
+    span.className='dm';
+    span.textContent=text;
+    span.style.setProperty('--dm-top',dmTop()+'px');
+    span.style.color=dmColors[Math.floor(Math.random()*dmColors.length)];
+    document.body.appendChild(span);
+    /* 动画结束后自动移除 */
+    span.addEventListener('animationend',()=>span.remove());
+  }
+
+  /* 发送入口 */
+  function send(){const v=dmInput.value.trim();if(v){shootDm(v);dmInput.value=''}}
+  dmSend.onclick=send;
+  dmInput.onkeydown=e=>{if(e.key==='Enter')send()};
   </script>
 </body>
 </html>
