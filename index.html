@@ -183,15 +183,15 @@
   <!-- ===== 观众互动弹幕 ===== -->
   <style>
   #dmBox{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:99999}
-  #dmInput{border:none;padding:10px 14px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.2);width:180px;font-size:14px}
-  #dmSend{background:#ff006e;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-size:14px;cursor:pointer}
+  #dmInput{border:none;padding:6px 14px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.2);width:180px;font-size:13px;background: rgba(255,255,255,.55);backdrop-filter: blur(6px);-webkit-backdrop-filter: blur(6px)}
+  #dmSend{background: rgba(255,0,110,.75);;color:#fff;border:none;padding:6px 18px;border-radius:20px;font-size:13px;cursor:pointer;backdrop-filter: blur(6px);-webkit-backdrop-filter: blur(6px)}
   .dm{position:fixed;white-space:nowrap;font-size:20px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);
       animation:dmMove 10s linear;z-index:99998;pointer-events:none;top:var(--dm-top)}
   @keyframes dmMove{from{right:-100%}to{right:100%}}
   </style>
 
   <div id="dmBox">
-    <input id="dmInput" placeholder="说点什么吧～" maxlength="30">
+    <input id="dmInput" placeholder="柏庭99～" maxlength="30">
     <button id="dmSend">发射</button>
   </div>
 
@@ -202,7 +202,7 @@
   const dmColors=['#ff006e','#ffbe0b','#fb5607','#8338ec','#3a86ff','#06ffa5'];
 
   /* 随机高度 */
-  function dmTop(){return Math.random()*window.innerHeight*.8+20}
+  function dmTop(){return Math.random()*window.innerHeight* 0.4}
 
   /* 创建一条弹幕 */
   function shootDm(text){
